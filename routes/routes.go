@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"librarymanagement/controllers"
-	"librarymanagement/middleware"
+	
 )
 
 func RegisterRoutes(r *gin.Engine) {
@@ -14,10 +14,15 @@ func RegisterRoutes(r *gin.Engine) {
 	}
 
 	api := r.Group("/api")
-	api.Use(middlewares.JWTAuthMiddleware())
+	// REMOVE middleware here
 	{
-		// api.GET("/books", controllers.GetBooks)
-		// api.POST("/books", middlewares.AdminOnlyMiddleware(), controllers.CreateBook)
-
+		adminRoutes := api.Group("/admins")
+		// REMOVE middleware here
+		{
+			adminRoutes.GET("/", controllers.GetAllAdmins)
+			adminRoutes.PUT("/:id", controllers.UpdateAdmin)
+			adminRoutes.DELETE("/:id", controllers.DeleteAdmin)
+		}
 	}
 }
+

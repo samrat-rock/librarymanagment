@@ -65,9 +65,62 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, _ := utils.GenerateToken(dbUser.ID, dbUser.Email, dbUser.Role)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
-		"token":   token,
+		"user":    dbUser,
 	})
+	
+}
+
+
+func GetAllAdmins(c *gin.Context) {
+	var admins []models.Admin
+	if err := config.DB.Find(&admins).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch admins"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"admins": admins})
+}
+
+func DeleteAdmin(c *gin.Context) {	
+	var admin models.Admin
+	id := c.Param("id")
+
+	if err := config.DB.Where("id = ?", id).First(&admin).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Admin not found"})
+		return
+	}
+
+	if err := config.DB.Delete(&admin).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete admin"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Admin deleted successfully"})
+}
+func UpdateAdmin(c *gin.Context) {
+	var input models.AdminUpdate
+	id := c.Param("id")
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var admin models.Admin
+	if err := config.DB.Where("id = ?", id).First(&admin).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Admin not found"})
+		return
+	}
+
+	admin.Username = input.Username
+	admin.Email = input.Email
+
+	if err := config.DB.Save(&admin).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update admin"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Admin updated successfully"})
 }
