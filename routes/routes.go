@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"librarymanagement/controllers"
+	"librarymanagement/middleware"
 )
 
 func RegisterRoutes(r *gin.Engine) {
@@ -11,12 +12,14 @@ func RegisterRoutes(r *gin.Engine) {
 	{
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
+		auth.POST("/logout", controllers.Logout)
+		
 	}
 
-	// Protected routes (You can add middleware later)
-	api := r.Group("/api")
+	
+	api := r.Group("/api", middleware.AuthMiddleware())
 	{
-		// Admin routes
+		
 		adminRoutes := api.Group("/admins")
 		{
 			adminRoutes.GET("/", controllers.GetAllAdmins)
@@ -24,7 +27,7 @@ func RegisterRoutes(r *gin.Engine) {
 			adminRoutes.DELETE("/:id", controllers.DeleteAdmin)
 		}
 
-		// Student routes
+		
 		studentRoutes := api.Group("/students")
 		{
 			studentRoutes.POST("/", controllers.CreateStudent)
@@ -55,3 +58,4 @@ func RegisterRoutes(r *gin.Engine) {
 		}
 	}
 }
+

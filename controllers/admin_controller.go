@@ -5,6 +5,7 @@ import (
 	"librarymanagement/models"
 	"librarymanagement/utils"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -65,12 +66,36 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	
+	token, err := utils.GenerateJWT(dbUser.Email, dbUser.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
-		"user":    dbUser,
+		"token":   token,
 	})
-	
 }
+
+
+
+
+func Logout(c *gin.Context) {
+    authHeader := c.GetHeader("Authorization")
+    if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Missing token"})
+        return
+    }
+
+    token := strings.TrimPrefix(authHeader, "Bearer ")
+    utils.BlacklistToken(token)
+
+    c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
+
+
 
 
 func GetAllAdmins(c *gin.Context) {
