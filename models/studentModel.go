@@ -1,9 +1,12 @@
 package models
 
 type Student struct {
-	ID        uint   `gorm:"primaryKey"`
-	FullName  string `json:"full_name" binding:"required"`
-	Email     string `gorm:"unique" json:"email" binding:"required,email"`
-	Phone     int32 `json:"phone" binding:"required"`
-	Department string `json:"department"`
+	ID        uint   `json:"id" gorm:"primaryKey"`
+	FirstName string `json:"first_name" gorm:"not null"`
+	LastName  string `json:"last_name" gorm:"not null"`
+	Email     string `json:"email" gorm:"unique;not null"`
+	Password  string `json:"password" gorm:"not null"`
+	Role      string `json:"role" gorm:"default:'student'"`
+	CreatedAt string `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt string `json:"updated_at" gorm:"autoUpdateTime"`
 }

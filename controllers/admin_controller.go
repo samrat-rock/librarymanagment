@@ -5,7 +5,7 @@ import (
 	"librarymanagement/models"
 	"librarymanagement/utils"
 	"net/http"
-	"strings"
+	
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,12 +33,14 @@ func Register(c *gin.Context) {
 	}
 
 	admin := models.Admin{
-		Username: input.Username,
-		Email:    input.Email,
-		Password: hashedPassword,
-		Role:     "admin",
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Username:  input.Username,
+		Email:     input.Email,
+		Password:  hashedPassword,
+		Role:      "admin",
 	}
-
+	
 	if err := config.DB.Create(&admin).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not register admin"})
 		return
@@ -79,21 +81,15 @@ func Login(c *gin.Context) {
 	})
 }
 
-
-
-
 func Logout(c *gin.Context) {
-    authHeader := c.GetHeader("Authorization")
-    if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Missing token"})
-        return
-    }
-
-    token := strings.TrimPrefix(authHeader, "Bearer ")
-    utils.BlacklistToken(token)
-
-    c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Logout successful. Please delete the token on client side.",
+    })
 }
+
+
+
+
 
 
 
