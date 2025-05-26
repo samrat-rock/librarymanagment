@@ -19,6 +19,15 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 
 		
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+		
+		if utils.IsTokenBlacklisted(tokenString) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is blacklisted. Please login again."})
+			c.Abort()
+			return
+		}
+
+
 		claims, err := utils.VerifyToken(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
@@ -26,13 +35,13 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-	
 		if claims.Role != "admin" {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Admin access only"})
 			c.Abort()
 			return
 		}
 
+	
 		c.Set("email", claims.Email)
 		c.Set("role", claims.Role)
 		c.Next()

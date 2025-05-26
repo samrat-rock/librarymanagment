@@ -27,7 +27,7 @@ func ConnectDB() {
 
 	DB = db
 
-	err = db.AutoMigrate(&models.Admin{})
+	err = db.AutoMigrate(&models.Admin{}, &models.TokenBlacklist{})
 	if err != nil {
 		log.Fatal("Failed to migrate:", err)
 	}

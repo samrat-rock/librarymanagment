@@ -5,7 +5,7 @@ import (
 	"librarymanagement/models"
 	"librarymanagement/utils"
 	"net/http"
-	
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -82,10 +82,26 @@ func Login(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{
-        "message": "Logout successful. Please delete the token on client side.",
-    })
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Authorization header missing"})
+		return
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	
+	blacklistedToken := models.TokenBlacklist{
+		Token: tokenString,
+	}
+	if err := config.DB.Create(&blacklistedToken).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to blacklist token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Logout successful"})
 }
+
 
 
 
@@ -120,6 +136,8 @@ func DeleteAdmin(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Admin deleted successfully"})
 }
+
+
 func UpdateAdmin(c *gin.Context) {
 	var input models.AdminUpdate
 	id := c.Param("id")
