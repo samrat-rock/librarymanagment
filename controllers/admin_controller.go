@@ -163,3 +163,41 @@ func UpdateAdmin(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Admin updated successfully"})
 }
+
+func GetAllStudents(c *gin.Context) {
+	var students []models.Student
+	if err := config.DB.Find(&students).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve students"})
+		return
+	}
+	c.JSON(http.StatusOK, students)
+}
+
+func DeleteStudent(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := config.DB.Delete(&models.Student{}, id).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete student"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Student deleted successfully"})
+}
+
+
+func UpdateStudent(c *gin.Context) {
+	id := c.Param("id")
+	var student models.StudentUpdate
+
+	if err := c.ShouldBindJSON(&student); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := config.DB.Model(&models.Student{}).Where("id = ?", id).Updates(student).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update student"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Student updated successfully"})
+}
