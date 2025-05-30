@@ -103,13 +103,6 @@ func Logout(c *gin.Context) {
 }
 
 
-
-
-
-
-
-
-
 func GetAllAdmins(c *gin.Context) {
 	var admins []models.Admin
 	if err := config.DB.Find(&admins).Error; err != nil {
@@ -201,3 +194,6 @@ func UpdateStudent(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Student updated successfully"})
 }
+
+
+
