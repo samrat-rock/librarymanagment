@@ -3,15 +3,15 @@ package controllers
 import (
 	"librarymanagement/config"
 	"librarymanagement/models"
-	
 
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"github.com/golang-jwt/jwt/v4"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func RegisterStudent(c *gin.Context) {
@@ -24,28 +24,26 @@ func RegisterStudent(c *gin.Context) {
 	}
 
 	
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(student.Password), 10)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
+hashedPassword, err := bcrypt.GenerateFromPassword([]byte(student.Password), 10)
+if err != nil {
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+	return
+}
 
-	
-	newStudent := models.Student{
-		FirstName:   student.FirstName,
-		LastName:    student.LastName,
-		Email:       student.Email,
-		Password:    string(hashedPassword),
-		Phone:       student.Phone,
-		ClassNumber: student.ClassNumber,
-		RollNo:      student.RollNo,
-	}
+newStudent := models.Student{
+	FirstName:   student.FirstName,
+	LastName:    student.LastName,
+	Email:       student.Email,
+	Password:    string(hashedPassword),
+	Phone:       student.Phone,
+	ClassNumber: student.ClassNumber,
+	RollNo:      student.RollNo,
+}
 
-
-	if err := config.DB.Create(&newStudent).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register student"})
-		return
-	}
+if err := config.DB.Create(&newStudent).Error; err != nil {
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register student"})
+	return
+}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Student registered successfully"})
 }

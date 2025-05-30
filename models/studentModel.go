@@ -17,16 +17,16 @@ type Student struct {
 }
 
 
-
 type StudentRegister struct {
 	FirstName   string `json:"first_name" binding:"required"`
 	LastName    string `json:"last_name" binding:"required"`
 	Email       string `json:"email" binding:"required,email"`
 	Password    string `json:"password" binding:"required"`
-	Phone       string `json:"phone" binding:"required"`
-	ClassNumber int `json:"class_number" binding:"required"`
+	Phone       string `json:"phone" binding:"required"` 
+	ClassNumber int    `json:"class_number" binding:"required"`
 	RollNo      string `json:"roll_no" binding:"required"`
 }
+
 
 
 type StudentLogin struct {
